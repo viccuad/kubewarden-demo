@@ -1,0 +1,6 @@
+
+signatures:
+- image: "ghcr.io/kubewarden/*"
+  github_actions:
+    owner: "kubewarden"
+

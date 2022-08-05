@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: jitesoft-alpine
+spec:
+  containers:
+  - image: registry.gitlab.com/jitesoft/dockerfiles/alpine:3.11.13
+    imagePullPolicy: Always
+    name: jitesoft-alpine
+    command:
+      - /bin/sleep
+      - 365d
