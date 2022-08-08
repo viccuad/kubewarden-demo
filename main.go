@@ -35,29 +35,6 @@ func sigstoreDemo() *demo.Run {
 	r.Step(demo.S(
 		"A simple k8s cluster with Kubewarden",
 	), demo.S("kubectl get nodes"))
-	r.Step(nil,
-		demo.S("kubectl get pods -A"))
-	r.Step(nil,
-		demo.S("helm ls -n kubewarden"))
-	r.Step(demo.S(
-		"We have the default PolicyServer",
-	), demo.S("kubectl get policyservers"))
-
-	r.Step(demo.S(
-		"Configuring PolicyServer to verify signatures of policies",
-	), demo.S("kwctl scaffold verification-config > verification_config.yml"))
-	r.Step(nil,
-		demo.S("bat verification_config.yml"))
-	r.Step(nil,
-		demo.S(`kubectl create configmap my-signatures-configuration \
-  --namespace kubewarden \
-  --from-file=verification-config=verification_config.yml`))
-	// r.Step(nil,
-	// 	demo.S("kubectl get configmap -o yaml -n kubewarden my-signatures-configuration | bat -l yaml"))
-	r.Step(nil,
-		demo.S(`kubectl patch policyserver default --patch '{"spec": {"verificationConfig": "my-signatures-configuration"}}' --type=merge`))
-	r.Step(nil,
-		demo.S("kubectl get policyserver default -o yaml | bat -l yaml"))
 
 	r.Step(demo.S("Deploying a policy to verify signatures of container images"),
 		demo.S("## https://artifacthub.io/packages/kubewarden/verify-image-signatures/verify-image-signatures"))
@@ -123,9 +100,6 @@ func pspDemo() *demo.Run {
 }
 
 func cleanup(ctx *cli.Context) error {
-	// exec.Command("kubectl", "delete", "podsecuritypolicy", "restricted").Run()
-	exec.Command("kubectl", "delete", "configmap", "my-signatures-configuration", "-n", "kubewarden").Run()
-	exec.Command("kubectl", "patch", "policyserver", "default", "--type=json", `-p="[{'op': 'remove', 'path': '/spec/verificationConfig'}]"`, "-n", "kubewarden").Run()
 	exec.Command("kubectl", "delete", "clusteradmissionpolicy", "--all").Run()
 	exec.Command("kubectl", "delete", "pod", "jitesoft-alpine").Run()
 	exec.Command("kubectl", "apply", "-f", "psp-restricted.yml").Run()
