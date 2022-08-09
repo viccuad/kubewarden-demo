@@ -9,11 +9,6 @@ import (
 const DEMO_NS = "test"
 
 func main() {
-	// cleanupNamespace()
-	// if err := setupNamespace(); err != nil {
-	// 	panic(err)
-	// }
-
 	d := demo.New()
 
 	d.HideVersion = true
@@ -26,8 +21,6 @@ func main() {
 
 func sigstoreDemo() *demo.Run {
 
-	exec.Command("kubectl", "delete", "podsecuritypolicy", "restricted").Run()
-
 	r := demo.NewRun(
 		"Kubewarden 💖 Sigstore",
 	)
@@ -38,25 +31,34 @@ func sigstoreDemo() *demo.Run {
 
 	r.Step(demo.S("Deploying a policy to verify signatures of container images"),
 		demo.S("## https://artifacthub.io/packages/kubewarden/verify-image-signatures/verify-image-signatures"))
+
+	r.Step(demo.S("We craft our policy settings"),
+		demo.S("bat policy-settings.yml"))
+
+	r.Step(demo.S("We can run the policy locally"),
+		demo.S(`bat test_data/request-goreleaser.json`))
+
+	r.Step(nil,
+		demo.S(`kwctl run --request-path test_data/request-goreleaser.json \
+  --settings-path policy-settings.yml \
+  registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.5`))
+
 	r.Step(nil,
 		demo.S(`kwctl scaffold manifest \
   --type ClusterAdmissionPolicy \
   --settings-path policy-settings.yml \
   --title verify-image-signatures \
   registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.5`))
-	r.Step(demo.S("Check the policy, make it mutating, include UPDATE operation"),
+
+	r.Step(demo.S("Review, make it mutating, include UPDATE operation"),
 		demo.S("bat verify-image-signatures-policy.yml"))
 
 	r.Step(demo.S("Apply the policy"),
 		demo.S("kubectl apply -f verify-image-signatures-policy.yml"))
 	r.Step(nil,
-		demo.S("kubectl get deployments -n kubewarden"))
-	r.Step(nil,
-		demo.S("kubectl rollout status deployment/policy-server-default -n kubewarden"))
-	r.Step(nil,
 		demo.S("kubectl get clusteradmissionpolicies"))
 	r.Step(nil,
-		demo.S("kubectl wait --timeout=2m --for=condition=PolicyActive clusteradmissionpolicies --all"))
+		demo.S("kubectl wait --timeout=2m --for=condition=PolicyActive clusteradmissionpolicies verify-image-signatures"))
 	r.Step(nil,
 		demo.S("kubectl get clusteradmissionpolicies"))
 
@@ -77,6 +79,9 @@ func sigstoreDemo() *demo.Run {
 }
 
 func pspDemo() *demo.Run {
+
+	exec.Command("kubectl", "apply", "-f", "psp-restricted.yml").Run()
+
 	r := demo.NewRun(
 		"Kubewarden ✨ PSPs",
 	)
@@ -100,8 +105,7 @@ func pspDemo() *demo.Run {
 }
 
 func cleanup(ctx *cli.Context) error {
-	exec.Command("kubectl", "delete", "clusteradmissionpolicy", "--all").Run()
+	// exec.Command("kubectl", "delete", "clusteradmissionpolicy", "--all").Run() //triggers policy-server, takes time
 	exec.Command("kubectl", "delete", "pod", "jitesoft-alpine").Run()
-	exec.Command("kubectl", "apply", "-f", "psp-restricted.yml").Run()
 	return nil
 }

@@ -5,7 +5,7 @@ metadata:
   name: goreleaser
 spec:
   containers:
-  - image: ghcr.io/goreleaser/goreleaser
+  - image: ghcr.io/goreleaser/goreleaser:v1.10.2
     imagePullPolicy: Always
     name: goreleaser
     command:

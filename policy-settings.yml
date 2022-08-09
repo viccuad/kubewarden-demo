@@ -1,6 +1,12 @@
-
 signatures:
-- image: "ghcr.io/kubewarden/*"
-  github_actions:
-    owner: "kubewarden"
-
+  - image: ghcr.io/* # or ghcr.io/kubewarden/*
+    github_actions:
+      owner: kubewarden
+      # repo: a-repo # optional
+  - image: registry.gitlab.com/jitesoft/dockerfiles/*
+    pubKeys:
+      - |
+        -----BEGIN PUBLIC KEY-----
+        MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+vEqphOu4MRxCmza5WemAY3HqvKN
+        LGKAdVa01UVROHo0DXozemQmZfhwPJiEJ2P7LZ3WSSRBJdvT4qpRuFbs+A==
+        -----END PUBLIC KEY-----
