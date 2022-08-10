@@ -70,6 +70,8 @@ func sigstoreDemo() *demo.Run {
 
 	// goreleaser signed
 	r.Step(nil,
+		demo.S("bat test_data/goreleaser-v1.yml"))
+	r.Step(nil,
 		demo.S("kubectl apply -f test_data/goreleaser-v1.yml"))
 
 	return r
