@@ -2,7 +2,6 @@ package main
 
 import (
 	demo "github.com/saschagrunert/demo"
-	"github.com/urfave/cli/v2"
 	"os/exec"
 )
 
@@ -102,7 +101,7 @@ func pspDemo() *demo.Run {
 	return r
 }
 
-func cleanup(ctx *cli.Context) error {
+func cleanup() error {
 	exec.Command("kubectl", "delete", "clusteradmissionpolicy", "--all").Run() //triggers policy-server, takes time
 	return nil
 }
