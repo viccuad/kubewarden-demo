@@ -12,7 +12,6 @@ func main() {
 	d := demo.New()
 
 	d.HideVersion = true
-	d.Setup(cleanup)
 	d.Add(sigstoreDemo(), "sigstore-demo", "sigstore demo")
 	d.Add(pspDemo(), "psp-demo", "psps demo")
 	d.Run()
@@ -20,6 +19,8 @@ func main() {
 }
 
 func sigstoreDemo() *demo.Run {
+
+	cleanup()
 
 	r := demo.NewRun(
 		"Kubewarden 💖 Sigstore",
@@ -30,7 +31,7 @@ func sigstoreDemo() *demo.Run {
 	), demo.S("kubectl get nodes"))
 
 	r.Step(demo.S("Deploying a policy to verify signatures of container images"),
-		demo.S("## https://artifacthub.io/packages/kubewarden/verify-image-signatures/verify-image-signatures"))
+		demo.S("## https://artifacthub.io"))
 
 	r.Step(demo.S("We craft our policy settings"),
 		demo.S("bat policy-settings.yml"))
@@ -50,7 +51,7 @@ func sigstoreDemo() *demo.Run {
   --title verify-image-signatures \
   registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.5`))
 
-	r.Step(demo.S("Review, make it mutating, include UPDATE operation"),
+	r.Step(demo.S("Review, e.g. include UPDATE operation"),
 		demo.S("bat verify-image-signatures-policy.yml"))
 
 	r.Step(demo.S("Apply the policy"),
@@ -62,18 +63,15 @@ func sigstoreDemo() *demo.Run {
 	r.Step(nil,
 		demo.S("kubectl get clusteradmissionpolicies"))
 
-	r.Step(nil,
-		demo.S("bat verify-image-signatures-policy.yml"))
-
-	r.Step(demo.S("Deploy a pod with untrusted images"),
+	// unsigned
+	r.Step(demo.S("Deploy a goreleaser pod"),
 		demo.S("bat test_data/goreleaser.yml"))
 	r.StepCanFail(nil,
 		demo.S("kubectl apply -f test_data/goreleaser.yml"))
 
-	r.Step(demo.S("Deploy a pod with a trusted image"),
-		demo.S("bat test_data/jitesoft-alpine.yml"))
-	r.StepCanFail(nil,
-		demo.S("kubectl apply -f test_data/jitesoft-alpine.yml"))
+	// goreleaser signed
+	r.Step(nil,
+		demo.S("kubectl apply -f test_data/goreleaser-v1.yml"))
 
 	return r
 }
@@ -105,7 +103,6 @@ func pspDemo() *demo.Run {
 }
 
 func cleanup(ctx *cli.Context) error {
-	// exec.Command("kubectl", "delete", "clusteradmissionpolicy", "--all").Run() //triggers policy-server, takes time
-	exec.Command("kubectl", "delete", "pod", "jitesoft-alpine").Run()
+	exec.Command("kubectl", "delete", "clusteradmissionpolicy", "--all").Run() //triggers policy-server, takes time
 	return nil
 }
