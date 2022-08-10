@@ -14,6 +14,7 @@ spec:
       - image: ghcr.io/kubewarden/*
         github_actions:
           owner: kubewarden
+    modifyImagesWithDigest: false
   rules:
     - apiGroups:
         - ""
