@@ -41,16 +41,17 @@ func sigstoreDemo() *demo.Run {
 	r.Step(nil,
 		demo.S(`kwctl run --request-path test_data/request-goreleaser.json \
   --settings-path policy-settings.yml \
-  registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.5`))
+  registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.6`))
 
 	r.Step(nil,
 		demo.S(`kwctl scaffold manifest \
   --type ClusterAdmissionPolicy \
   --settings-path policy-settings.yml \
   --title verify-image-signatures \
-  registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.5`))
+  registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.6 \
+  > verify-image-signatures-policy.yml`))
 
-	r.Step(demo.S("Review, e.g. include UPDATE operation"),
+	r.Step(nil,
 		demo.S("bat verify-image-signatures-policy.yml"))
 
 	r.Step(demo.S("Apply the policy"),
@@ -105,5 +106,7 @@ func pspDemo() *demo.Run {
 
 func cleanup() error {
 	exec.Command("kubectl", "delete", "clusteradmissionpolicy", "--all").Run() //triggers policy-server, takes time
+	exec.Command("kubectl", "delete", "pod", "goreleaser").Run()
+	exec.Command("kubectl", "delete", "pod", "goreleaser-v1").Run()
 	return nil
 }

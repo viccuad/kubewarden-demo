@@ -4,13 +4,12 @@ kind: ClusterAdmissionPolicy
 metadata:
   name: verify-image-signatures
 spec:
-  module: "registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.5"
+  module: "registry://ghcr.io/kubewarden/policies/verify-image-signatures:v0.1.6"
   settings:
     signatures:
       - image: ghcr.io/goreleaser/*
         github_actions:
           owner: goreleaser
-          # repo: a-repo # optional
       - image: ghcr.io/kubewarden/*
         github_actions:
           owner: kubewarden
@@ -25,4 +24,4 @@ spec:
       operations:
         - CREATE
         - UPDATE
-  mutating: false
+  mutating: true

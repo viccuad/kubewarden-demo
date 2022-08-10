@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: goreleaser
+  name: goreleaser-v1
 spec:
   containers:
   - image: ghcr.io/goreleaser/goreleaser:v0.175.0
